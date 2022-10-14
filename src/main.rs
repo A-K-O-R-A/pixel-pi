@@ -9,7 +9,7 @@ fn main() -> io::Result<()> {
     let mut f = File::open(file_path)?;
     println!("PI file {}", file_path);
 
-    let seq = find_sequence(&[3, 1, 4], &mut f);
+    let seq = find_sequence("314", &mut f);
     println!("Seq: {:?}", seq);
 
     Ok(())
@@ -26,7 +26,7 @@ fn find_sequence(str_seq: &str, f: &mut File) -> io::Result<()> {
     f.seek(io::SeekFrom::Start(pos))?;
     // up to one block
     let n = f.read(&mut buffer[..])?;
-    buffer.
+    //buffer.
     println!("Buffer len: {n}");
 
     let s = str::from_utf8(&buffer).expect("L");
