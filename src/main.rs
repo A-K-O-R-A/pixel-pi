@@ -30,6 +30,7 @@ fn find_sequence(str_seq: &str, f: &mut File) -> io::Result<()> {
     println!("Buffer len: {n}");
 
     let s = str::from_utf8(&buffer).expect("L");
+    
     println!("Buffer: {s}");
     //Search squenze in specific Block
 
