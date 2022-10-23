@@ -6,7 +6,7 @@ use std::str;
 
 const TEXT_PATH: &str = "./pi.txt";
 const BIN_PATH: &str = "./pi.bin";
-const BLOCK_SIZE: usize = 1024 * 246;
+const BLOCK_SIZE: usize = 1024 * 512;
 
 fn main() -> io::Result<()> {
     let mut txt_f = File::open(TEXT_PATH)?;
@@ -20,7 +20,7 @@ fn main() -> io::Result<()> {
     let mut cur_pos: usize = 0;
     let file_length = txt_f.metadata().expect("Couldn't read length").len();
 
-    while (cur_pos as u64) < file_length {
+    while (cur_pos as u64) <= file_length {
         //Seek forwards another block
         //f.seek(io::SeekFrom::Current(BLOCK_SIZE as i64))?;
         
@@ -34,11 +34,14 @@ fn main() -> io::Result<()> {
         let nums: Vec<u8> = sli.chars().map(char_to_num).collect();
         bin_f.write(&nums)?;
 
-        println!("{} / {}", cur_pos/BLOCK_SIZE, file_length/(BLOCK_SIZE as u64));
+        //println!("{} / {}", cur_pos/BLOCK_SIZE, file_length/(BLOCK_SIZE as u64));
 
         cur_pos += BLOCK_SIZE;
     }
 
+    println!("closing files");
+    drop(txt_f);
+    drop(bin_f);
     println!("Done");
 
     Ok(())
