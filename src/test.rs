@@ -37,7 +37,7 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-
+/*
 fn char_to_num(c: char) -> u8 {
     match c {
         '0' => 0,
@@ -53,3 +53,4 @@ fn char_to_num(c: char) -> u8 {
         _ => 0
     }
 }
+ */
