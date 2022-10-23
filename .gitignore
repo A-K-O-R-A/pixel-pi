@@ -1,2 +1,5 @@
 target/
 pi.txt
+
+perf.data
+flamegraph.svg
