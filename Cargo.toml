@@ -3,8 +3,17 @@ name = "pixel-pi"
 version = "0.1.0"
 authors = ["runner"]
 edition = "2021"
+default-run = "pixel-pi"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 bigdecimal = "0.3.0"
+
+[[bin]]
+name = "convert"
+path = "src/convert.rs"
+
+[[bin]]
+name = "test"
+path = "src/test.rs"
