@@ -2,16 +2,23 @@ use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 use std::str;
+use std::env;
 
 const FILE_PATH: &str = "./pi.txt";
-const SEQUENCE: &str = "6942000";
 
 fn main() -> io::Result<()> {
+    let args: Vec<String> = env::args().collect();
+    let sequence = &args[1];
+    println!("sequence: {sequence}");
+
     let mut f = File::open(FILE_PATH)?;
-    println!("text file {FILE_PATH}");
-    println!("sequence {SEQUENCE}");
-    let seq_pos = find_sequence(SEQUENCE, &mut f)?;
+    println!("opened text file {FILE_PATH}");
+
+    let seq_pos = find_sequence(sequence, &mut f)?;
     println!("sequence found at position {seq_pos}");
+
+    drop(f);
+    println!("closed file");
 
     Ok(())
 }
