@@ -11,12 +11,12 @@ default-run = "pixel-pi"
 debug = true
 
 [dependencies]
- #bigdecimal = "0.3.0"
+#bigdecimal = "0.3.0"
 
 [[bin]]
 name = "convert"
 path = "src/convert.rs"
 
 [[bin]]
-name = "test"
-path = "src/test.rs"
+name = "count"
+path = "src/count.rs"

@@ -1,20 +1,33 @@
+use std::env;
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 use std::str;
-use std::env;
 
-const FILE_PATH: &str = "./pi.txt";
+const PI_PATH: &str = "./pi_data/pi_dec_1b.txt";
 
 fn main() -> io::Result<()> {
     let args: Vec<String> = env::args().collect();
     let sequence = &args[1];
-    println!("sequence: {sequence}");
+    println!("searching for sequence: {sequence:?}");
 
-    let mut f = File::open(FILE_PATH)?;
-    println!("opened text file {FILE_PATH}");
+    let mut f = File::open(PI_PATH)?;
+    f.seek(io::SeekFrom::Start(2))?; //Skip the first two characters "3."
 
-    let seq_pos = find_sequence(sequence, &mut f)?;
+    println!("opened pi text file at {PI_PATH:?}");
+
+    // Only use printabel characters
+    // Refer to https://www.ascii-code.com/
+    let number_sequence = sequence
+        .chars()
+        .map(|c| (c as u8 - 32).to_string())
+        .reduce(|acc, e| acc + &e)
+        .unwrap();
+
+    println!("number sequence: {number_sequence:?}");
+
+    let seq_pos = find_sequence(sequence.as_bytes(), &mut f)? + 1;
+    println!("\n\n");
     println!("sequence found at position {seq_pos}");
 
     drop(f);
@@ -23,32 +36,35 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-const BLOCK_SIZE: usize = 1024 / 2;
+const BLOCK_SIZE: usize = 1024 * 512;
 
-fn find_sequence(str_seq: &str, f: &mut File) -> io::Result<usize> {
-    let seq: &[u8] = str_seq.as_bytes();
-    let seq_len = seq.into_iter().count();
+/// Returns the offset at which point the provided sequence begins in the file (does not accountt for previous seeking)
+fn find_sequence(seq: &[u8], f: &mut File) -> io::Result<usize> {
+    let seq_len = seq.len();
 
     let mut cur_buffer = [0; BLOCK_SIZE];
-    let mut cur_pos: usize = 0;
-    let file_length = f.metadata()?.len();
+    let mut cur_offset: usize = 0;
+    let file_size = f.metadata()?.len();
 
-    while (cur_pos as u64) <= file_length {
+    while (cur_offset as u64) <= file_size {
         //Read one block into current buffer
-        let _n = f.read(&mut cur_buffer[..])?;
+        let n = f.read(&mut cur_buffer[..])?;
 
-        for i in 0..(BLOCK_SIZE - seq_len) {
-            let buf_slice = &cur_buffer[i..(i + seq_len)];
-            //Search sequence in specific Block
-            let same = seq == buf_slice;
-            if same {
-                return Ok(cur_pos+i - 2);
-            }
+        if let Some((found_index, _)) = cur_buffer[0..n]
+            .windows(seq_len)
+            .enumerate()
+            .find(|(_i, w)| *w == seq)
+        {
+            return Ok(cur_offset + found_index);
         }
 
+        cur_offset += BLOCK_SIZE;
 
-        cur_pos += BLOCK_SIZE;
+        print!("\r{:.2}%", (cur_offset as f64) * 100.0 / (file_size as f64));
     }
 
-    Err(io::Error::new(io::ErrorKind::Other, "Didn't find sequence"))
+    Err(io::Error::new(
+        io::ErrorKind::NotFound,
+        "Unable to find sequence in file",
+    ))
 }
