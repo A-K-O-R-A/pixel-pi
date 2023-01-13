@@ -3,6 +3,7 @@ use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 use std::str;
+use std::time::Instant;
 
 mod util;
 
@@ -30,9 +31,12 @@ fn main() -> io::Result<()> {
     println!("number sequence: {number_sequence:?}");
     */
 
+    let started = Instant::now();
     let seq_pos = util::find_sequence(sequence.as_bytes(), &mut f)? + 1;
-    println!("\n\n");
-    println!("sequence found at position {seq_pos}");
+    let elapsed = started.elapsed();
+
+    print!("\n");
+    println!("sequence found at position {seq_pos} in {elapsed:?}");
 
     drop(f);
     println!("closed file");
